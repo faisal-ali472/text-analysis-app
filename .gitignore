@@ -50,5 +50,5 @@ env/
 /node_modules/
 
 # webpack-built files
-/analyzerapp/static/build/
-/analyzerapp/webpack/manifest.json
+#/analyzerapp/static/build/
+#/analyzerapp/webpack/manifest.json
