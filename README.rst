@@ -1,5 +1,5 @@
 ===============================
-cc_text_analyzer
+Text Analysis Application
 ===============================
 
 A basic text analyzing application.
@@ -17,7 +17,7 @@ add the following to ``.bashrc`` or ``.bash_profile``.
 
 Run the following commands to bootstrap your environment ::
 
-    git clone https://github.com/faisal-ali472/analyzerapp
+    git clone https://github.com/faisal-ali472/text-analysis-app
     cd analyzerapp
     pip install -r requirements/dev.txt
     npm install

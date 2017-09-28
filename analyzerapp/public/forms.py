@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Public forms."""
 from flask_wtf import Form
-from wtforms import PasswordField, StringField
-from wtforms.validators import DataRequired
+from wtforms import PasswordField, StringField, TextAreaField
+from wtforms.validators import DataRequired, URL
 
 from analyzerapp.user.models import User
 
@@ -37,3 +37,7 @@ class LoginForm(Form):
             self.username.errors.append('User not activated')
             return False
         return True
+
+class UserInput(Form):
+    input_text = TextAreaField('InputText', validators=[DataRequired()])
+    input_link = StringField('InputLink', validators=[DataRequired(), URL(message="Invalid URL")])
