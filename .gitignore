@@ -52,3 +52,9 @@ env/
 # webpack-built files
 #/analyzerapp/static/build/
 #/analyzerapp/webpack/manifest.json
+
+# cookiecutter-flask dev.txt
+requirements/dev (orig).txt
+
+# Pycharm project folder
+.idea
