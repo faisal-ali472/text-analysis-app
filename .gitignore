@@ -58,3 +58,5 @@ requirements/dev (orig).txt
 
 # Pycharm project folder
 .idea
+# autoenv file
+/.env

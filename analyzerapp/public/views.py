@@ -1,23 +1,14 @@
 # -*- coding: utf-8 -*-
 """Public section, including homepage and signup."""
-from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import login_required, login_user, logout_user
+from flask import Blueprint, flash, redirect, render_template, request, url_for, jsonify, current_app
+from flask_login import login_required, logout_user
 
 from analyzerapp.extensions import login_manager
 from analyzerapp.public.forms import LoginForm, UserInput
 from analyzerapp.user.forms import RegisterForm
 from analyzerapp.user.models import User
 from analyzerapp.utils import flash_errors
-
-import os
-import operator
-import re
-import requests
-import nltk
-from nltk.corpus import stopwords
-from collections import Counter
-from bs4 import BeautifulSoup
-
+from analyzerapp.celery import create_celery
 
 
 blueprint = Blueprint('public', __name__, static_folder='../static')
@@ -34,10 +25,7 @@ def home():
     """Home page."""
     form = LoginForm(request.form)
     input_form = UserInput(request.form)
-
-    errors = []
-    results = {}
-
+    results = []
     # Handle logging in
     if request.method == 'POST':
         # Start: Commented by FA; Nav. bar not required, 27/09/17
@@ -50,45 +38,32 @@ def home():
         #     flash_errors(form)
         # End
 
+        # celery init
+        celery = create_celery(current_app)
 
-        # Get url that the user has entered
-        try:
-            url = input_form.input_link.data
-            r = requests.get(url)
-        except:
-            errors.append(
-                "Unable to get URL. Please make sure it's valid and try again."
-            )
-        if r:
-            # text processing
-            raw = BeautifulSoup(r.text, 'html.parser').get_text()
-            nltk.data.path.append(os.getcwd() + '/nltk_data/')  # set the path
-            tokens = nltk.word_tokenize(raw)
-            text = nltk.Text(tokens)
-            # remove punctuation, count raw words
-            nonPunct = re.compile('.*[A-Za-z].*')
-            raw_words = [w for w in text if nonPunct.match(w)]
-            raw_word_count = Counter(raw_words)
-            # stop words
-            no_stop_words = [w.lower() for w in raw_words if w.lower() not in stopwords.words()]
-            no_stop_words_count = Counter(no_stop_words)
-            # save the results
-            results = sorted(
-                no_stop_words_count.items(),
-                key=operator.itemgetter(1),
-                reverse=True
-            )[:20]
-            # try:
-            #     result = Result(
-            #         url=url,
-            #         result_all=raw_word_count,
-            #         result_no_stop_words=no_stop_words_count
-            #     )
-            #     db.session.add(result)
-            #     db.session.commit()
-            # except:
-            #     errors.append("Unable to add item to database.")
+        # # get url that the person has entered
+        url = input_form.input_link.data
+        res = celery.send_task("tasks.count_words", args=(url,30,))
+
+        print("Task ID: ")
+        print(res.id)
+        return redirect(url_for('public.get_results', job_key=str(res.id)))
     return render_template('public/home.html', form=form, input_form=input_form, results=results)
+
+
+@blueprint.route("/results/<job_key>", methods=['GET'])
+def get_results(job_key):
+    celery = create_celery(current_app)
+    job = celery.AsyncResult(job_key)
+    if job.state == 'SUCCESS':
+        return jsonify(job.get()['results']), 200
+    else:
+        return job.state, 202
+
+
+@blueprint.route("/Viz/")
+def plot_visualization():
+    return render_template("public/visualize.html")
 
 
 @blueprint.route('/logout/')
