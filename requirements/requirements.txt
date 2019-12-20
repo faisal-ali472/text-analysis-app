@@ -53,7 +53,7 @@ SQLAlchemy==1.1.14
 testfixtures==5.2.0
 textblob==0.13.0
 urllib3==1.22
-waitress==1.0.2
+waitress==1.4.0
 WebOb==1.7.3
 WebTest==2.0.28
 Werkzeug==0.12.2
