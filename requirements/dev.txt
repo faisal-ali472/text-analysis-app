@@ -59,7 +59,7 @@ snowballstemmer==1.2.1
 SQLAlchemy==1.1.14
 testfixtures==5.2.0
 textblob==0.13.0
-urllib3==1.22
+urllib3==1.26.5
 vine==1.1.4
 waitress==1.0.2
 WebOb==1.7.3
