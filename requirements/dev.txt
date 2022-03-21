@@ -61,7 +61,7 @@ testfixtures==5.2.0
 textblob==0.13.0
 urllib3==1.22
 vine==1.1.4
-waitress==1.0.2
+waitress==2.1.1
 WebOb==1.7.3
 WebTest==2.0.28
 Werkzeug==0.12.2
